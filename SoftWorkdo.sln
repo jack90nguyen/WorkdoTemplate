@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32819.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Workdo", "Workdo\Workdo.csproj", "{0057E5C0-6F84-4104-BE94-9115E1C65367}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0057E5C0-6F84-4104-BE94-9115E1C65367}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0057E5C0-6F84-4104-BE94-9115E1C65367}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0057E5C0-6F84-4104-BE94-9115E1C65367}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0057E5C0-6F84-4104-BE94-9115E1C65367}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3DB9655E-49EC-4BC3-BED9-97F8954BF070}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,127 @@
+﻿@page "/"
+@layout LayoutLogin
+@inject IJSRuntime JSRuntime
+@inject ProtectedLocalStorage storage
+@inject NavigationManager navigation
+
+<div class="card p-5" style="opacity: @(_loaded ? "1" : "0")">
+  @if (user == null)
+  {
+    <h1 class="title is-5 has-text-info is-uppercase">
+      Đăng nhập hệ thống
+    </h1>
+    <form @onsubmit="SignIn">
+      <div class="field">
+        <label class="label">Tên đăng nhập</label>
+        <div class="control has-icons-left">
+          <input @bind="username" type="text" class="input" placeholder="Nhập email..." />
+          <span class="icon is-left">
+            <span class="material-icons-outlined is-size-5">
+              account_circle
+            </span>
+          </span>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Mật khẩu</label>
+        <div class="control has-icons-left">
+          <input @bind="password" type="password" class="input" placeholder="Nhập password..." />
+          <span class="icon is-left">
+            <span class="material-icons-outlined is-size-5">
+              lock
+            </span>
+          </span>
+        </div>
+      </div>
+      <div class="field is-grouped is-vcentered mt-5">
+        <div class="control is-expanded">
+          <button class="button is-link" @onclick="SignIn">
+            <span class="icon">
+              <i class="material-icons-outlined is-size-6">login</i>
+            </span>
+            <span>Đăng nhập</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  }
+  else
+  {
+    <h1 class="is-size-6 has-text-weight-medium has-text-info mb-2">
+      Xin chào ! @user.first_name @user.last_name
+    </h1>
+    <div class="mb-3">
+      Hãy chọn công ty
+    </div>
+    <div class="field">
+      <a class="icon-text has-text-link" href="/home">
+        <span class="icon">
+          <i class="material-icons-outlined is-size-5">apartment</i>
+        </span>
+        <span class="has-text-weight-bold">Workdo</span>
+      </a>
+    </div>
+    <hr class="my-2" />
+    <div class="field">
+      <a class="icon-text has-text-danger" @onclick="Logout">
+        <span class="icon">
+          <i class="material-icons-outlined is-size-6">logout</i>
+        </span>
+        <span class="has-text-weight-medium">Đăng xuất</span>
+      </a>
+    </div>
+  }
+</div>
+
+@code {
+  private bool _loaded = false;
+  private string username = "admin@workdo.com";
+  private string password = "admin@#";
+  private UserModel user = null;
+
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    try
+    {
+      if (firstRender)
+      {
+        var userStorage = await storage.GetAsync<string>("user");
+        if (userStorage.Success && !string.IsNullOrEmpty(userStorage.Value))
+        {
+          user = await UserData.Get(userStorage.Value);
+          if (user == null)
+            await JSRuntime.InvokeVoidAsync("localStorage.clear");
+        }
+        _loaded = true;
+        StateHasChanged();
+      }
+    }
+    catch (Exception ex)
+    {
+      await JSRuntime.InvokeVoidAsync("localStorage.clear");
+      await JSRuntime.InvokeAsync<string>("console.log", ex.Message);
+    }
+  }
+
+  private async Task SignIn()
+  {
+    user = await UserData.Login(username, password);
+    if (user != null)
+    {
+      await storage.SetAsync("user", user.session);
+      navigation.NavigateTo("/home", true);
+    }
+    else
+    {
+      await JSRuntime.InvokeVoidAsync("tagline", false, "Tên đăng nhập hoặc mật khẩu không đúng !");
+    }
+  }
+
+  private async Task Logout()
+  {
+    if (!await JSRuntime.InvokeAsync<bool>("confirm", $"Bạn có chắc muốn đăng xuất khỏi phần mềm ?"))
+      return;
+
+    navigation.NavigateTo("/logout", true);
+  }
+}

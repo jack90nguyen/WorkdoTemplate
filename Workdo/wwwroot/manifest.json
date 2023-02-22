@@ -1,0 +1,17 @@
+﻿{
+  "short_name": "Workdo",
+  "name": "Workdo",
+  "description": "Workdo - Hệ thống quản trị doanh nghiệp",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "/",
+  "theme_color": "#565c7c",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/images/favicon.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    }
+  ]
+}

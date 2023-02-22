@@ -1,0 +1,15 @@
+﻿@inherits LayoutComponentBase
+@inject ProtectedLocalStorage storage
+@inject NavigationManager navigation
+
+<CascadingValue Value="this">
+  <main id="main" class="columns is-mobile is-centered is-vcentered">
+    <section class="column is-narrow" style="width: 400px;">
+      @Body
+    </section>
+  </main>
+</CascadingValue>
+
+@code {
+
+}

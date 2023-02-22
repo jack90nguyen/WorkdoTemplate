@@ -1,0 +1,99 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Web
+@namespace Workdo.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+  Layout = null;
+  var title = "Workdo";
+  var desc = "Hệ thống quản trị doanh nghiệp toàn diện: OKRs, Work, Todolist, Train, Kaizen..";
+  var icon = "/images/favicon.png";
+  var cover = "/images/cover.png";
+  var domain = "https://workdo.conando.vn";
+}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//En" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" lang="vi">
+<head>
+  <base href="~/" />
+  <title>@title</title>
+  <meta http-equiv="refresh" content="7200" />
+  <meta name="tilte" content="@title" />
+  <meta name="description" content="@desc" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" />
+  <link rel="stylesheet" href="css/bulma.min.css" />
+  <link rel="stylesheet" href="css/animate.min.css" />
+  <link rel="stylesheet" href="css/icon.material.css" />
+  <link rel="stylesheet" href="css/app.css" />
+  <link rel="stylesheet" href="Workdo.styles.css">
+  <link rel="stylesheet" href="css/mobile.css" />
+  <link rel="stylesheet" href="css/effect.css" />
+  <link rel="stylesheet" href="css/dragdrop.css" />
+  <link rel="stylesheet" href="css/quill.snow.css" />
+  <link rel="stylesheet" href="css/quill.bubble.css" />
+  <link rel="stylesheet" href="_content/BlazorDateRangePicker/daterangepicker.min.css" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="@domain" />
+  <meta property="og:title" content="@title" />
+  <meta property="og:description" content="@desc" />
+  <meta property="og:image" content="@cover" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+  <link href="@icon" rel="shortcut icon" />
+  <link href="@icon" rel="icon" type="image/png" />
+  <link href="@icon" rel="apple-touch-icon" />
+
+  <meta name="theme-color" content="#585c7d" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+  <meta name="application-name" content="@title" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="@title" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="msapplication-TileImage" content="@icon" />
+  <meta name="msapplication-TileColor" content="#565c7c" />
+  <meta name="msapplication-tap-highlight" content="no" />
+  <link rel="manifest" href="/manifest.json" />
+  <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+</head>
+<body>
+  <component type="typeof(App)" render-mode="ServerPrerendered" />
+
+  <div id="blazor-error-ui">
+    <div class="modal is-active">
+      <div class="modal-background"></div>
+      <div class="modal-content">
+        <div class="field has-addons">
+          <div class="control">
+            <span class="button is-white is-loading">
+              <span class="icon">
+                <i class="material-icons-outlined is-size-5">refresh</i>
+              </span>
+            </span>
+          </div>
+          <div class="control is-expanded">
+            <div class="button is-white is-fullwidth pl-1">
+              Đang kết nối lại...
+            </div>
+          </div>
+          <div class="control">
+            <a class="button is-link is-light" title="Tải lại trang" onclick="document.location.reload()">
+              Thử lại
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="_framework/blazor.server.js"></script>
+  <script src="~/js/chart.min.js"></script>
+  <script src="~/js/quill.js"></script>
+  <script src="~/js/app.js"></script>
+  <script src="_content/BlazorDateRangePicker/clickAndPositionHandler.js"></script>
+  <script src="_content/Blazored.TextEditor/quill-blot-formatter.min.js"></script>
+  <script src="_content/Blazored.TextEditor/Blazored-BlazorQuill.js"></script>
+</body>
+</html>

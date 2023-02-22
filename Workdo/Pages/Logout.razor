@@ -1,0 +1,17 @@
+﻿@page "/logout"
+@layout LayoutLogin
+@inject IJSRuntime JSRuntime
+@inject ProtectedLocalStorage storage
+@inject NavigationManager navigation
+
+@code {
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (firstRender)
+    {
+      await JSRuntime.InvokeVoidAsync("localStorage.clear");
+
+      navigation.NavigateTo("/", true);
+    }
+  }
+}

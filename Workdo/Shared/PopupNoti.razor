@@ -1,0 +1,140 @@
+@inject IJSRuntime JSRuntime
+@inject ProtectedLocalStorage storage
+@inject NavigationManager navigation
+
+<div class="dropdown-menu">
+  <div class="dropdown-content p-0 font_14">
+    <div class="field is-grouped px-5 py-4">
+      <div class="control is-expanded">
+        @if(type == "mail")
+        {
+          <div class="is-size-6 has-text-weight-semibold">Thông báo Hòm thư</div>
+        }
+        else if(type == "blogs")
+        {
+          <div class="is-size-6 has-text-weight-semibold">Thông báo Tin tức</div>
+        }
+        else if(type == "okrs")
+        {
+          <div class="is-size-6 has-text-weight-semibold">Thông báo CFRs</div>
+        }
+        else if(type == "plan")
+        {
+          <div class="is-size-6 has-text-weight-semibold">Thông báo Kế hoạch</div>
+        }
+        else if(type == "educate")
+        {
+          <div class="is-size-6 has-text-weight-semibold">Thông báo Đào tạo</div>
+        }
+        else if(type == "other")
+        {
+          <div class="is-size-6 has-text-weight-semibold">Thông báo khác</div>
+        }
+      </div>
+      <div class="control">
+          <a class="icon has-text-dark" @onclick="Close">
+            <i class="material-icons-outlined is-size-5">close</i>
+          </a>
+      </div>
+    </div>
+    <div class="scrolly px-5 py-4">
+      @if(type == "other")
+      {
+        <div class="tags">
+          <a class="tag is-rounded @(type_id == 0 ? "is-link has-text-weight-bold" : "is-white has-text-grey")"
+            @onclick="() => type_id = 0">Tất cả</a>
+          <a class="tag is-rounded @(type_id == 200 ? "is-link has-text-weight-bold" : "is-white has-text-grey")"
+            @onclick="() => type_id = 200">Todolist</a>
+          <a class="tag is-rounded @(type_id == 300 ? "is-link has-text-weight-bold" : "is-white has-text-grey")"
+            @onclick="() => type_id = 300">Đổi quà</a>
+          <a class="tag is-rounded @(type_id == 100 ? "is-link has-text-weight-bold" : "is-white has-text-grey")"
+            @onclick="() => type_id = 100">Kaizen</a>
+          <a class="tag is-rounded @(type_id == 10 ? "is-link has-text-weight-bold" : "is-white has-text-grey")"
+            @onclick="() => type_id = 1">Khác</a>
+        </div>
+      }
+      @for (int i = 0; i < count_max; i++)
+      {
+        if(i < model.Count)
+        {
+          var item = model[i];
+          if(type_id == 0 || (item.type >= type_id && item.type <= type_id + 50))
+          {
+            var avatar = SharedHelper.IsEmpty(item.avatar) ? "/images/avatar.png" : item.avatar;
+            <div class="field is-grouped">
+              <div class="control">
+                <div class="image is-rounded is-48x48">
+                  <img src="@avatar">
+                </div>
+              </div>
+              <div class="control is-expanded">
+                <a class="@(item.read ? "has-text-grey" : "has-text-black")" @onclick="() => ViewItem(item)">
+                  @((MarkupString)item.name)
+                </a>
+                <p>@SharedHelper.ConvertDate(new DateTime(item.date))</p>
+              </div>
+            </div>
+          }
+        }
+      }
+      @if(model.Count == 0)
+      {
+        <div class="has-text-grey">
+          Không có thông báo mới
+        </div>
+      }
+    </div>
+    <div class="field is-grouped px-5 py-3">
+      <div class="control is-expanded">
+        @if(count_max < model.Count)
+        {
+          <a @onclick="() => count_max = model.Count">Xem tất cả</a>
+        }
+      </div>
+      <div class="control">
+        <a @onclick="Readed">Đánh dấu đã đọc</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+@code {
+  [CascadingParameter]
+  public LayoutMain Layout { get; set; }
+  [Parameter]
+  public string type { get; set; }
+  [Parameter]
+  public List<NotifyModel> model { get; set; }
+  [Parameter]
+  public EventCallback OnClose { get; set; }
+
+  private int type_id = 0;
+  private int count_max = 10;
+
+  private async Task Close()
+  {
+    type_id = 0;
+    count_max = 10;
+    await OnClose.InvokeAsync();
+  }
+  
+  private async Task Readed()
+  {
+    foreach (var item in model)
+    {
+      if (!item.read)
+      {
+        item.read = true;
+      }
+    }
+    await Close();
+  }
+
+  private async Task ViewItem(NotifyModel item)
+  {
+    item.read = true;
+    if (!string.IsNullOrEmpty(item.link))
+      navigation.NavigateTo(item.link, false);
+    await Close();
+  }
+}

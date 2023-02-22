@@ -1,0 +1,21 @@
+@page "/home"
+@inject IJSRuntime JSRuntime
+@inject NavigationManager navigation
+
+<PageTitle>Trang chủ</PageTitle>
+
+<section class="p-4">
+  <div class="card p-5">
+    <h1 class="title is-5 has-text-info">
+      Workdo Home Page
+    </h1>
+    <div class="py-6">
+      Đây là đoạn nội dung mẫu để kiểm tra giao diện, bạn có thể thay đổi trong phần quản trị của website.
+    </div>
+  </div>
+</section>
+
+@code {
+  [CascadingParameter]
+  public LayoutMain Layout { get; set; }
+}

@@ -1,0 +1,73 @@
+﻿@inherits LayoutComponentBase
+@inject IJSRuntime JSRuntime
+@inject ProtectedLocalStorage storage
+@inject NavigationManager navigation
+
+<CascadingValue Value="this">
+  <main id="main" class="columns is-gapless is-multiline">
+    @if (User != null)
+    {
+      <aside class="column is-narrow">
+        <Sidebar />
+      </aside>
+      <section id="content" class="column">
+        <HeaderMain />
+        @Body
+      </section>
+    }
+    else
+    {
+      <section class="column is-full movingBallG"></section>
+    }
+  </main>
+</CascadingValue>
+
+@code {
+  public UserModel User = null;
+  public bool IsMobile = false;
+  public int PageSize = 25;
+  public long MaxFileSize = 10 * 1024000;
+
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    try
+    {
+      if (firstRender)
+      {
+        var userAgent = await JSRuntime.InvokeAsync<string>("getUserAgent");
+        IsMobile = SharedHelper.DeviceMobile(userAgent);
+        await JSRuntime.InvokeVoidAsync("console.log", "Device detection: " + (IsMobile ? "Mobile" : "Desktop"));
+        
+        var userStorage = await storage.GetAsync<string>("user");
+        if (!userStorage.Success || string.IsNullOrEmpty(userStorage.Value))
+        {
+          await JSRuntime.InvokeVoidAsync("localStorage.clear");
+          navigation.NavigateTo("/", true);
+          return;
+        }
+        else
+        {
+          User = await UserData.Get(userStorage.Value);
+          if (User == null)
+          {
+            await JSRuntime.InvokeVoidAsync("localStorage.clear");
+            navigation.NavigateTo("/", true);
+            return;
+          }
+          else
+          {
+            await JSRuntime.InvokeVoidAsync("console.log", "User = " + User.email);
+          }
+        }
+        await InvokeAsync(StateHasChanged);
+      }
+    }
+    catch (Exception ex)
+    {
+      await JSRuntime.InvokeVoidAsync("localStorage.clear");
+      await JSRuntime.InvokeVoidAsync("console.log", ex.Message);
+      navigation.NavigateTo("/", true);
+      return;
+    }
+  }
+}

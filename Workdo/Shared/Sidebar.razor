@@ -1,0 +1,337 @@
+﻿@inject IJSRuntime JSRuntime
+@inject ProtectedLocalStorage storage
+@inject NavigationManager navigation
+
+<section id="sidebar" class="@(navLess ? "is_less" : "") @(navMobile ? "is_expanded" : "")">
+  <div class="columns is-vcentered is-gapless is-mobile px-2 mb-0">
+    <div class="column is-narrow">
+      <a class="sidebar_toggle button is-white is-hidden-mobile" @onclick="ToggleSidebar">
+        <span></span>
+        <span></span>
+        <span></span>
+      </a>
+      <a class="sidebar_toggle button is-white is-hidden-tablet" @onclick="ToogleMobile">
+        <span></span>
+        <span></span>
+        <span></span>
+      </a>
+    </div>
+    <div class="column">
+      <span class="has-text-white has-text-weight-semibold is-hidden-tablet" style="letter-spacing: 3px;">WORKDO</span>
+    </div>
+    <div class="column is-narrow hide_less">
+      <div class="dropdown is-hoverable is-right">
+        <div class="dropdown-trigger">
+          <a class="button is-white p-0 pr-2 font_13">
+            <span class="text_1_line" style="max-width: 100px;">
+              @cycleName
+            </span>
+            <span class="icon is-small">
+              <span class="material-icons-outlined">
+                arrow_drop_down
+              </span>
+            </span>
+          </a>
+        </div>
+        <div class="dropdown-menu font_13">
+          <div class="dropdown-content">
+            @for (int i = 1; i <= 4; i++)
+            { 
+              int cycle = i;
+              <a class="dropdown-item" @onclick="() => ChangeCycle(cycle)">
+                Quý @i - 2023
+              </a>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="column is-narrow is-hidden-tablet">
+      <div class="image is-32x32 is-rounded" title="Hi, @Layout.User.first_name @Layout.User.last_name">
+        <img src="@Layout.User.avatar" alt="IMG" />
+      </div>
+    </div>
+  </div>
+  <nav class="scrolly mt-4">
+    <ul>
+      @foreach (var main in ListNav)
+      {
+        var isUp = main.link == "#config" ? "is_up" : "";
+        <li class="@(main.active ? "is-active" : "") @isUp">
+          @if (main.childs != null)
+          {
+            <a class="button is-white" @onclick="() => main.active = !main.active">
+              <span class="icon">
+                <i class="material-icons-outlined">
+                  @main.icon
+                </i>
+              </span>
+              <span>@main.name</span>
+              <span class="icon">
+                <i class="material-icons-outlined">arrow_right</i>
+              </span>
+            </a>
+            <ul>
+              @foreach (var child in main.childs)
+              {
+                <li class="@(child.active ? "is-active" : "")">
+                  @if (child.childs != null)
+                  {
+                    <a class="button is-white" @onclick="() => child.active = !child.active">
+                      <span>@child.name</span>
+                      <span class="icon">
+                        <i class="material-icons-outlined">arrow_right</i>
+                      </span>
+                    </a>
+                    <ul>
+                      @foreach (var sub in child.childs)
+                      {
+                        <li class="@(sub.active ? "is-active" : "")">
+                          <a class="button is-white" href="@sub.link">
+                            <span>@sub.name</span>
+                          </a>
+                        </li>
+                      }
+                    </ul>
+                  }
+                  else
+                  {
+                    <a class="button is-white" href="@child.link">
+                      <span>@child.name</span>
+                    </a>
+                  }
+                </li>
+              }
+            </ul>
+          }
+          else
+          {
+            <a class="button is-white" href="@main.link">
+              <span class="icon">
+                <i class="material-icons-outlined">
+                  @main.icon
+                </i>
+              </span>
+              <span>@main.name</span>
+            </a>
+          }
+        </li>
+      }
+    </ul>
+  </nav>
+  <a class="button is-white btn_logout" @onclick="Logout" title="Đăng xuất">
+    <span class="icon">
+      <i class="material-icons-outlined">logout</i>
+    </span>
+    <span>Đăng xuất</span>
+  </a>
+</section>
+
+@code {
+  [CascadingParameter]
+  public LayoutMain Layout { get; set; }
+  private List<NavModel> ListNav = new();
+  private bool navLess = false;
+  private bool navMobile = false;
+  private string cycleName = "Chọn chu kỳ";
+
+  protected override void OnInitialized()
+  {
+    Navigation();
+  }
+
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    try
+    {
+      if (firstRender)
+      {
+        var navStorage = await storage.GetAsync<string>("navLess");
+        if (navStorage.Success && !string.IsNullOrEmpty(navStorage.Value))
+          navLess = Convert.ToBoolean(navStorage.Value);
+        StateHasChanged();
+      }
+    }
+    catch (Exception)
+    {
+      return;
+    }
+  }
+
+  protected override void OnParametersSet()
+  {
+    navMobile = false;
+
+    var url = navigation.Uri.Replace(navigation.BaseUri, "");
+
+    foreach (var main in ListNav)
+    {
+      main.active = url.StartsWith(main.link.Replace("#", ""));
+      if (main.childs != null)
+      {
+        foreach (var child in main.childs)
+        {
+          child.active = url.StartsWith(child.link.Replace("#", ""));
+          if (child.childs != null)
+          {
+            foreach (var sub in child.childs)
+            {
+              sub.active = url.StartsWith(sub.link.Replace("#", ""));
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private void ChangeCycle(int id)
+  {
+    cycleName = $"Quý {id} - 2023";
+  }
+
+  private async Task ToggleSidebar()
+  {
+    navLess = !navLess;
+    await storage.SetAsync("navLess", navLess.ToString());
+  }
+
+  private void ToogleMobile()
+  {
+    navMobile = !navMobile;
+  }
+
+  private async Task Logout()
+  {
+    if (!await JSRuntime.InvokeAsync<bool>("confirm", $"Bạn có chắc muốn đăng xuất khỏi phần mềm ?"))
+      return;
+
+    navigation.NavigateTo("/logout", true);
+  }
+
+  private void Navigation()
+  {
+    ListNav = new();
+    ListNav.Add(new NavModel
+      {
+        name = "Trang chủ",
+        link = "home",
+        icon = "home"
+      });
+    ListNav.Add(new NavModel
+      {
+        name = "Tin tức",
+        link = "blogs",
+        icon = "dashboard"
+      });
+    ListNav.Add(new NavModel
+      {
+        name = "Thống kê",
+        link = "reports",
+        icon = "bar_chart"
+      });
+    ListNav.Add(new NavModel
+      {
+        name = "Đội nhóm",
+        link = "teams",
+        icon = "group"
+      });
+    ListNav.Add(new NavModel
+      {
+        name = "Todolist",
+        link = "todolist",
+        icon = "check_box"
+      });
+    ListNav.Add(new NavModel
+      {
+        name = "Kế hoạch",
+        link = "work",
+        icon = "view_timeline"
+      });
+    ListNav.Add(new NavModel
+      {
+        name = "OKRs",
+        link = "#okr",
+        icon = "track_changes",
+        childs = new List<NavModel>
+        {
+          new NavModel { name = "Thiết lập", link = "#okr/setup",
+            childs = new List<NavModel>
+            {
+              new NavModel { name = "Timeline", link = "okr/setup/timeline" },
+              new NavModel { name = "Góp ý mục tiêu", link = "okr/setup/suggest" },
+              new NavModel { name = "Công bố mục tiêu", link = "okr/setup/target" },
+              new NavModel { name = "Tạo OKRs", link = "okr/setup/detail" },
+            }
+          },
+          new NavModel { name = "Hành động", link = "okr/tasks" },
+          new NavModel { name = "Tổng quan", link = "okr/overview" },
+        }
+      });
+    ListNav.Add(new NavModel
+      {
+        name = "CFRs",
+        link = "#cfr",
+        icon = "grade",
+        childs = new List<NavModel>
+        {
+          new NavModel { name = "Check-in", link = "cfr/checkin" },
+          new NavModel { name = "Ghi nhận - Tặng sao", link = "cfr/star" }
+        }
+      });
+    ListNav.Add(new NavModel
+      {
+        name = "Kaizen",
+        link = "kaizen",
+        icon = "show_chart"
+      });
+    ListNav.Add(new NavModel
+      {
+        name = "Đổi quà",
+        link = "#gift",
+        icon = "card_giftcard",
+        childs = new List<NavModel>
+        {
+          new NavModel { name = "Cửa hàng", link = "gift/product" },
+          new NavModel { name = "Lịch sử đổi quà", link = "gift/exchange" }
+        }
+      });
+    ListNav.Add(new NavModel
+      {
+        name = "Đào tạo",
+        link = "#educate",
+        icon = "book",
+        childs = new List<NavModel>
+        {
+          new NavModel { name = "Khóa học", link = "educate/course/list" },
+          new NavModel { name = "Quản lý khóa học", link = "educate/course/manager" },
+          new NavModel { name = "Chấm bài thi", link = "educate/exam/manager" },
+          new NavModel { name = "Cấp chứng chỉ", link = "educate/certificate/manager" },
+          new NavModel { name = "Chứng chỉ đạt được", link = "educate/certificate/list" },
+        }
+      });
+
+    ListNav.Add(new NavModel
+      {
+        name = "Cấu hình",
+        link = "#config",
+        icon = "settings",
+        childs = new List<NavModel>
+          {
+            new NavModel { name = "Cơ cấu", link = "config/system" },
+            new NavModel { name = "OKRs - CFRs", link = "config/okrs" },
+            new NavModel { name = "Todolist", link = "config/todolist" },
+            new NavModel { name = "Kaizen", link = "config/kaizen" },
+            new NavModel { name = "Đổi quà", link = "config/gift" },
+            new NavModel { name = "Đào tạo", link = "config/educate" },
+            new NavModel { name = "Tiện ích", link = "config/other" }
+          }
+      });
+
+    ListNav.Add(new NavModel
+      {
+        name = "Tài khoản",
+        link = "user/info",
+        icon = "account_circle"
+      });
+  }
+}

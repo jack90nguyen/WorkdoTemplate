@@ -1,0 +1,199 @@
+@inject IJSRuntime JSRuntime
+@inject ProtectedLocalStorage storage
+@inject NavigationManager navigation
+
+<section id="header" class="header_main">
+  <ul class="columns is-mobile is-vcentered is-variable is-1">
+    <li class="column">
+      <div class="icon-text">
+        <span class="icon image is-24x24 is-rounded">
+          <img src="@Layout.User.avatar">
+        </span>
+        <span class="has-text-black has-text-weight-medium ml-3 font_14 is-hidden-mobile">
+          @Layout.User.FullName
+        </span>
+      </div>
+    </li>
+    <li class="column is-narrow">
+      <div class="is-noti dropdown is-right @(toggleActive == "mail" ? "is-active" : "")">
+        <div class="dropdown-trigger">
+          <a class="button is-white" @onclick='() => Toggle("mail")'>
+            <span class="icon">
+              <i class="material-icons-outlined is-size-6">email</i>
+            </span>
+            @if(count_mail > 0)
+            {
+              <span>@count_mail</span>
+            }
+          </a>
+        </div>
+        @if(toggleActive == "mail")
+        {
+          <PopupNoti model="dataList" type="mail" OnClose="Close" />
+        }
+      </div>
+    </li>
+    <li class="column is-narrow">
+      <div class="is-noti dropdown is-right @(toggleActive == "blogs" ? "is-active" : "")">
+        <div class="dropdown-trigger">
+          <a class="button is-white" @onclick='() => Toggle("blogs")'>
+            <span class="icon">
+              <i class="material-icons-outlined is-size-6">dashboard</i>
+            </span>
+            @if(count_blogs > 0)
+            {
+              <span>@count_blogs</span>
+            }
+          </a>
+        </div>
+        @if(toggleActive == "blogs")
+        {
+          <PopupNoti model="dataList" type="blogs" OnClose="Close" />
+        }
+      </div>
+    </li>
+    <li class="column is-narrow">
+      <div class="is-noti dropdown is-right @(toggleActive == "okrs" ? "is-active" : "")">
+        <div class="dropdown-trigger">
+          <a class="button is-white" @onclick='() => Toggle("okrs")'>
+            <span class="icon">
+              <i class="material-icons-outlined is-size-6">grade</i>
+            </span>
+            @if(count_okrs > 0)
+            {
+              <span>@count_okrs</span>
+            }
+          </a>
+        </div>
+        @if(toggleActive == "okrs")
+        {
+          <PopupNoti model="dataList" type="okrs" OnClose="Close" />
+        }
+      </div>
+    </li>
+    <li class="column is-narrow">
+      <div class="is-noti dropdown is-right @(toggleActive == "plan" ? "is-active" : "")">
+        <div class="dropdown-trigger">
+          <a class="button is-white" @onclick='() => Toggle("plan")'>
+            <span class="icon">
+              <i class="material-icons-outlined is-size-6">view_timeline</i>
+            </span>
+            @if(count_plan > 0)
+            {
+              <span>@count_plan</span>
+            }
+          </a>
+        </div>
+        @if(toggleActive == "plan")
+        {
+          <PopupNoti model="dataList" type="plan" OnClose="Close" />
+        }
+      </div>
+    </li>
+    <li class="column is-narrow">
+      <div class="is-noti dropdown is-right @(toggleActive == "educate" ? "is-active" : "")">
+        <div class="dropdown-trigger">
+          <a class="button is-white" @onclick='() => Toggle("educate")'>
+            <span class="icon">
+              <i class="material-icons-outlined is-size-6">book</i>
+            </span>
+            @if(count_educate > 0)
+            {
+              <span>@count_educate</span>
+            }
+          </a>
+        </div>
+        @if(toggleActive == "educate")
+        {
+          <PopupNoti model="dataList" type="educate" OnClose="Close" />
+        }
+      </div>
+    </li>
+    <li class="column is-narrow">
+      <div class="is-noti dropdown is-right @(toggleActive == "other" ? "is-active" : "")">
+        <div class="dropdown-trigger">
+          <a class="button is-white" @onclick='() => Toggle("other")'>
+            <span class="icon">
+              <i class="material-icons-outlined is-size-6">notifications</i>
+            </span>
+            @if(count_other > 0)
+            {
+              <span>@count_other</span>
+            }
+          </a>
+        </div>
+        @if(toggleActive == "other")
+        {
+          <PopupNoti model="dataList" type="other" OnClose="Close" />
+        }
+      </div>
+    </li>
+  </ul>
+</section>
+
+@code {
+  [CascadingParameter]
+  public LayoutMain Layout { get; set; }
+  private string toggleActive = string.Empty;
+  private int count_mail = 0;
+  private int count_blogs = 0;
+  private int count_okrs = 0;
+  private int count_plan = 0;
+  private int count_educate = 0;
+  private int count_other = 0;
+  private List<NotifyModel> database = new();
+  private List<NotifyModel> dataList = new();
+
+  protected override async Task OnParametersSetAsync()
+  {
+    toggleActive = string.Empty;
+    await GetAllData();
+  }
+
+  private async Task GetAllData()
+  {
+    await Task.Delay(100);
+    count_mail = 0;
+    count_blogs = database.Where(x => !x.read && x.type == 9).Count();;
+    count_okrs = database.Where(x => !x.read && x.type >= 500 && x.type <= 550).Count();
+    count_educate = database.Where(x => !x.read && x.type >= 600 && x.type <= 650).Count();
+    count_plan = database.Where(x => !x.read && x.type >= 700 && x.type <= 750).Count();
+    count_other = database.Where(x => !x.read && x.type >= 10 && x.type <= 350).Count();
+    NotiList();
+  }
+
+  private void NotiList()
+  {
+    dataList = new();
+    if(!SharedHelper.IsEmpty(toggleActive))
+    {
+      if(toggleActive == "blogs")
+        dataList = database.Where(x => x.type == 9).ToList();
+      if(toggleActive == "okrs")
+        dataList = database.Where(x => x.type >= 500 && x.type <= 550).ToList();
+      else if(toggleActive == "educate")
+        dataList = database.Where(x => x.type >= 600 && x.type <= 650).ToList();
+      else if(toggleActive == "plan")
+        dataList = database.Where(x => x.type >= 700 && x.type <= 750).ToList();
+      else if(toggleActive == "other")
+        dataList = database.Where(x => x.type >= 10 && x.type <= 350).ToList();
+    }
+  }
+
+  private async Task Toggle(string type)
+  {
+    if(SharedHelper.IsEmpty(toggleActive))
+      toggleActive = type;
+    else if(toggleActive != type)
+      toggleActive = type;
+    else if(toggleActive == type)
+      toggleActive = string.Empty;
+    await GetAllData();
+  }
+
+  private async Task Close()
+  {
+    toggleActive = string.Empty;
+    await GetAllData();
+  }
+}
