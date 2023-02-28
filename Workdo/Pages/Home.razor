@@ -12,10 +12,22 @@
     <div class="py-6">
       Đây là đoạn nội dung mẫu để kiểm tra giao diện, bạn có thể thay đổi trong phần quản trị của website.
     </div>
+    <_Component data="@testName" OnUpdate="UpdateComponent" />
+    <div>@testName</div>
   </div>
 </section>
 
 @code {
   [CascadingParameter]
   public LayoutMain Layout { get; set; }
+  private string testName = "test nhé";
+
+  private async Task UpdateComponent(string data)
+  {
+    testName = data;
+    if(string.IsNullOrEmpty(data))
+      await JSRuntime.InvokeVoidAsync("tagline", false, testName);
+    else
+      await JSRuntime.InvokeVoidAsync("tagline", true, testName);
+  }
 }

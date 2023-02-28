@@ -1,0 +1,40 @@
+
+<div class="field is-grouped">
+  <div class="control is-expanded"> 
+    <input @bind="data" class="input" type="text" placeholder="Nhập nội dung...">
+  </div>
+  <div class="control">
+    <a class="button is-link" @onclick="Update">
+      <span class="icon">
+        <i class="material-icons-outlined is-size-5">done</i>
+      </span>
+      <span>Update</span>
+    </a>
+  </div>
+  <div class="control">
+    <a class="button" @onclick="Cancel">
+      <span class="icon">
+        <i class="material-icons-outlined is-size-5">close</i>
+      </span>
+      <span>Cancal</span>
+    </a>
+  </div>
+</div>
+
+@code {
+  [Parameter]
+  public string data { get; set; }
+  [Parameter]
+  public EventCallback<string> OnUpdate { get; set; }
+
+  private async Task Cancel()
+  {
+    data = string.Empty;
+    await OnUpdate.InvokeAsync(data);
+  }
+
+  private async Task Update()
+  {
+    await OnUpdate.InvokeAsync(data);
+  }
+}
