@@ -22,6 +22,14 @@
   public LayoutMain Layout { get; set; }
   private string testName = "test nhé";
 
+  protected override void OnInitialized()
+  {
+    for (int i = 0; i < 20; i++)
+    {
+      Console.WriteLine(DataService.RandomId());
+    }
+  }
+
   private async Task UpdateComponent(string data)
   {
     testName = data;
