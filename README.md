@@ -9,8 +9,6 @@ Workdo is a web app developed for Docorp, used to manage and operate the organiz
 - Kaizen
 - Todolist
 - Train
-- ...
-
-## TEST GIT
+- Plan
 
 > Developed by jack90nguyen
